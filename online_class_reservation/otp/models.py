@@ -8,6 +8,6 @@ class OtpType(DjangoChoices):
 class Otp(models.Model):
   otp=models.IntegerField()
   expires_at=models.DateTimeField()
-  otp_type=models.IntegerField(choices=OtpType.choices, validators=[OtpType.validator])
+  otp_type=models.IntegerField(choices=OtpType.choices, validators=[OtpType.validator], default=OtpType.Class)
   email=models.EmailField(max_length=254, null=True, blank=True)
   class_id=models.IntegerField(null=True, blank=True)
