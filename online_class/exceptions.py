@@ -10,6 +10,10 @@ class ExceptionCodes:
     CLASS_SEATS_BOOKED_MORE_THAN_TOTAL='CLS002'
     RESERVE_SEAT_DETAILS='RS001'
     RESERVE_CLASS_CONFIRMED='RS002'
+    RESERVE_CLASS_CANCELLED='RS003'
+    CANCEL_SEAT_DETAILS='CN001'
+    CONFIRM_SEAT_CANCELLED='CNS001'
+    CONFIRM_SEAT_DOES_NOT_EXIST='CNS002'
 
 class AppException(APIException):
   status_code = status.HTTP_400_BAD_REQUEST
@@ -37,3 +41,20 @@ class ReserveSeatDetailsMissingException(AppException, Http400):
 class ReserveClassConfirmedException(AppException, Http400):
     def __init__(self, message='Reserved class has already been confirmed', params=None):
       super(ReserveClassConfirmedException, self).__init__(message, ExceptionCodes.RESERVE_CLASS_CONFIRMED, params=params)
+
+class ReserveClassCancelledException(AppException, Http400):
+    def __init__(self, message='Reserved class has been expired, please book again', params=None):
+      super(ReserveClassCancelledException, self).__init__(message, ExceptionCodes.RESERVE_CLASS_CANCELLED, params=params)
+
+
+class CancelSeatDetailsMissingException(AppException, Http400):
+    def __init__(self, message='Please pass details...', params=None):
+      super(CancelSeatDetailsMissingException, self).__init__(message, ExceptionCodes.CANCEL_SEAT_DETAILS, params=params)
+
+class ConfirmSeatCancelledException(AppException, Http400):
+    def __init__(self, message='The seat has already been cancelled', params=None):
+      super(ConfirmSeatCancelledException, self).__init__(message, ExceptionCodes.CONFIRM_SEAT_CANCELLED, params=params)
+
+class ConfirmSeatDoesNotExistException(AppException, Http400):
+    def __init__(self, message='The seat has not yet been confirmed', params=None):
+      super(ConfirmSeatDoesNotExistException, self).__init__(message, ExceptionCodes.CONFIRM_SEAT_DOES_NOT_EXIST, params=params)

@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'online_class',
+    'online_class.apps.OnlineClassConfig',
     'otp'
 ]
 

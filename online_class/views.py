@@ -10,13 +10,16 @@ from datetime import timedelta
 from django.utils import timezone
 
 
-from .models import Class, ClassStatus, User, ClassReserved, ClassConfirmed
+from .models import Class, ClassStatus, User, ClassReserved, ClassConfirmed, ClassReservedStatus
 from otp.models import Otp, validate_otp
 from .serializer import ClassSerializer
 from .exceptions import ClassUpdateException, \
   ClassSeatBookedMoreThanTotalException, \
     ReserveSeatDetailsMissingException,\
-      ReserveClassConfirmedException
+      ReserveClassConfirmedException, ReserveClassCancelledException, \
+        CancelSeatDetailsMissingException, \
+          ConfirmSeatCancelledException, \
+            ConfirmSeatDoesNotExistException
 
 from otp.exceptions import OtpMissingException
 
@@ -164,10 +167,17 @@ def confirm_class_seat(request):
 
   class_object = Class.objects.get(id=otp_object.class_id)
   class_reserved_object = ClassReserved.objects.get(class_id=class_object)
+
+  if class_reserved_object.status == ClassReservedStatus.Cancelled:
+    raise ReserveClassCancelledException()
+
   ClassConfirmed.objects.create(
     class_id=class_object,
     user_id = class_reserved_object.user_id
   )
+
+  class_reserved_object.status=ClassReservedStatus.Confirmed
+  class_reserved_object.save()
 
   return Response("Successfully confirmed class with details {}".format(class_object.id), status=status.HTTP_200_OK)
 
@@ -176,7 +186,44 @@ def confirm_class_seat(request):
 @api_view(['POST'])
 @require_http_methods(["POST"])
 def cancel_class_seat(request):
-  pass
+  if not request.data:
+      raise ReserveSeatDetailsMissingException("Please pass the data")
+
+  class_id= request.data['class']
+  user_id = request.data['user']
+
+  if user_id is None:
+    raise CancelSeatDetailsMissingException("Please pass user id")
+
+  if class_id is None:
+    raise CancelSeatDetailsMissingException("Please pass class id")
+
+  try:
+    class_object = Class.objects.get(id=class_id)
+  except Class.DoesNotExist:
+    raise CancelSeatDetailsMissingException("Class id is incorrect")
+
+
+  try:
+    user = User.objects.get(id=user_id)
+  except User.DoesNotExist:
+    raise ReserveSeatDetailsMissingException("User id is incorrect")
+
+  try:
+    class_confirmed_object = ClassConfirmed.objects.get(class_id=class_object, user_id=user)
+    if not class_confirmed_object.is_active:
+      raise ConfirmSeatCancelledException()
+  except ClassConfirmed.DoesNotExist:
+    raise ConfirmSeatDoesNotExistException()
+
+  class_object.seats_booked -= 1
+  class_object.save()
+
+  class_confirmed_object.is_active = False
+  class_confirmed_object.save()
+
+  return Response("Successfully cancelled class", status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @require_http_methods(["GET"])
