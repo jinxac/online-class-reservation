@@ -3,15 +3,14 @@ from django.db.models import UniqueConstraint
 from djchoices.choices import ChoiceItem, DjangoChoices
 from django.core.validators import MinLengthValidator
 
+from .exceptions import ClassSeatBookedMoreThanTotalException
+
 # Create your models here.
 class ClassType(models.Model):
   name=models.CharField(max_length=100)
-  code=models.CharField(max_length=100)
+  code=models.CharField(max_length=100, unique=True)
 
-  UniqueConstraint(
-    name='unique_code',
-    fields=['code']
-)
+
 class ClassStatus(DjangoChoices):
     Upcoming = ChoiceItem(0)
     Ongoing  = ChoiceItem(1)
@@ -24,13 +23,13 @@ class Class(models.Model):
   number_of_seats=models.PositiveIntegerField()
   seats_booked=models.PositiveIntegerField()
   status=models.IntegerField(choices=ClassStatus.choices, validators=[ClassStatus.validator], default=ClassStatus.Upcoming)
-  start_date=models.DateTimeField(null=True, blank=True)
+  start_date=models.DateTimeField(auto_now_add=True,null=True, blank=True)
   end_date=models.DateTimeField(null=True, blank=True)
   is_active=models.BooleanField(default=True)
 
   def save(self, *args, **kwargs):
     if self.seats_booked > self.number_of_seats:
-      raise ValueError("Number of seats booked cannot be greater than the total number of seats")
+      raise ClassSeatBookedMoreThanTotalException()
 
     super().save(*args, **kwargs)
 
@@ -46,9 +45,12 @@ class ClassReservedStatus(DjangoChoices):
   Cancelled=ChoiceItem(2)
 
 class ClassReserved(models.Model):
-  class_id=models.ForeignKey(Class, related_name="class_id", on_delete=models.CASCADE)
-  status=models.IntergerField(choices=ClassReservedStatus.choices, validators=[ClassReservedStatus.validator], default=ClassReservedStatus.Pending)
+  class_id=models.ForeignKey(Class, related_name="class_reserved_class_id", on_delete=models.CASCADE)
+  status=models.IntegerField(choices=ClassReservedStatus.choices, validators=[ClassReservedStatus.validator], default=ClassReservedStatus.Pending)
+  user_id=models.ForeignKey(User, related_name="class_reserved_user_id", on_delete=models.CASCADE)
 
-class ClassBooked(models.Model):
-  class_id=models.ForeignKey(Class, related_name="class_id", on_delete=models.CASCADE)
+class ClassConfirmed(models.Model):
+  class_id=models.ForeignKey(Class, related_name="class_confirmed_class_id", on_delete=models.CASCADE)
   is_active=models.BooleanField(default=True)
+  user_id=models.ForeignKey(User, related_name="class_confirmed_user_id", on_delete=models.CASCADE)
+
