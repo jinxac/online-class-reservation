@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,12 @@ SECRET_KEY = 'hv*5r$ikk)f6t2trypagmh3nggz44-ug_u==@ygo$#tp-4xu2g'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": "",
+    "MAILGUN_SENDER_DOMAIN": ''
+}
 
 
 # Application definition
@@ -87,6 +94,37 @@ DATABASES = {
     }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+            'stream': sys.stdout
+        },
+        'online_class_logs': {
+            'level': 'DEBUG',
+            'filename': '/var/log/online_class/app/app.log',
+            'class': 'logging.FileHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'online_class': {
+            'handlers': ['console', 'online_class_logs'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
 
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"  # or sendgrid.EmailBackend, or...

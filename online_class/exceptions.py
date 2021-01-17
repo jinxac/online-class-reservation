@@ -1,9 +1,4 @@
-from rest_framework.exceptions import APIException
-from rest_framework import status
-
-
-class Http400(Exception):
-    http_code = 400
+from exceptions.exceptions import AppException, Http400
 
 class ExceptionCodes:
     CLASS_UPDATE = 'CLS001'
@@ -14,17 +9,6 @@ class ExceptionCodes:
     CANCEL_SEAT_DETAILS='CN001'
     CONFIRM_SEAT_CANCELLED='CNS001'
     CONFIRM_SEAT_DOES_NOT_EXIST='CNS002'
-
-class AppException(APIException):
-  status_code = status.HTTP_400_BAD_REQUEST
-
-  def __init__(self, message, error_code, params=None):
-    self.message=message
-    self.error_code=error_code
-    self.detail={
-      "message": self.message,
-      "error_code": self.error_code
-    }
 
 class ClassUpdateException(AppException, Http400):
     def __init__(self, message='Cannot update ongoing or completed class', params=None):

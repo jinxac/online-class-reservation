@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import ClassViewSet, reserve_class_seat, confirm_class_seat, get_report
+from .views import ClassViewSet, reserve_class_seat, confirm_class_seat, get_report, cancel_class_seat
 
 urlpatterns = [
     path('classes/', ClassViewSet.as_view({
@@ -14,5 +14,6 @@ urlpatterns = [
     })),
     path('classes/reserve-seat/', reserve_class_seat),
     path('classes/confirm-seat/', confirm_class_seat),
+    path('classes/cancel-seat/', cancel_class_seat),
     path('report/', get_report)
 ]
