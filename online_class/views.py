@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from datetime import timedelta
 from django.utils import timezone
+from django.core.mail import send_mail
+from rest_framework.pagination import PageNumberPagination
 
 
 from .models import Class, ClassStatus, User, ClassReserved, ClassConfirmed, ClassReservedStatus
@@ -22,8 +24,8 @@ from .exceptions import ClassUpdateException, \
             ConfirmSeatDoesNotExistException
 
 from otp.exceptions import OtpMissingException
-
-class ClassViewSet(viewsets.ViewSet):
+class ClassViewSet(viewsets.ModelViewSet):
+  pagination_class = CustomPagination
   def get_object(self, pk):
     try:
         return Class.objects.get(pk=pk)
@@ -147,13 +149,13 @@ def reserve_class_seat(request):
     class_object.seats_booked += 1
     class_object.save()
 
-  # Todo: send email
+  # send_mail("Confirmation OTP", "The otp for the confirmation of class is {}".format(otp_object.otp),
+  #         "", ["saluja.harkirat@gmail.com"])
   return Response("Successfully reserved class with otp {}".format(otp_object.otp), status=status.HTTP_200_OK)
 
 
 @csrf_exempt
 @api_view(['POST'])
-@require_http_methods(["POST"])
 def confirm_class_seat(request):
   if not request.data:
     raise OtpMissingException()
@@ -178,13 +180,13 @@ def confirm_class_seat(request):
 
   class_reserved_object.status=ClassReservedStatus.Confirmed
   class_reserved_object.save()
-
+# send_mail("Class Confirmed", "Successfully confirmed class with name {}".format(class_object.name),
+  #         "", ["saluja.harkirat@gmail.com"])
   return Response("Successfully confirmed class with details {}".format(class_object.id), status=status.HTTP_200_OK)
 
 
 @csrf_exempt
 @api_view(['POST'])
-@require_http_methods(["POST"])
 def cancel_class_seat(request):
   if not request.data:
       raise ReserveSeatDetailsMissingException("Please pass the data")
@@ -226,6 +228,31 @@ def cancel_class_seat(request):
 
 
 @csrf_exempt
-@require_http_methods(["GET"])
+@api_view(['GET'])
 def get_report(request):
-  pass
+  class_queryset = Class.objects.all()
+  number_of_classes = class_queryset.count()
+  number_of_users = User.objects.count()
+
+  number_of_active_classes =class_queryset.filter(status=ClassStatus.Ongoing).count()
+  number_of_upcoming_classes = class_queryset.filter(status=ClassStatus.Upcoming).count()
+  number_of_completed_classes = class_queryset.filter(status=ClassStatus.Completed).count()
+
+  confirmed_seats = []
+
+  for datum in class_queryset:
+    confirmed_seats.append({
+      "class_id": datum.id,
+      "seats_booked": datum.seats_booked
+    })
+
+  data = {
+    "number_of_classes": number_of_classes,
+    "number_of_users": number_of_users,
+    "confirmed_seats": confirmed_seats,
+    "number_of_active_classes": number_of_active_classes,
+    "number_of_upcoming_classes": number_of_upcoming_classes,
+    "number_of_completed_classes": number_of_completed_classes
+  }
+
+  return Response(data, status=status.HTTP_200_OK)
