@@ -12,68 +12,66 @@ confirm his/ her reservation within 5 mins.
 4. The user should receive an OTP or confirmation link via email.
 5. Logging of API requests and responses where necessary.
 
+
 ### Features
+  1. `GET /api/v0/classes/`
 
 
-**Class**
+    Returns list of classes available. The possible filters are start date, type of class, status and page number.
+    The filters can be passed as query parameters.
 
-    1. `GET /api/v0/classes/`
+  2. `POST /api/v0/classes/`
 
+    Create a new class
 
-      Returns list of classes available. The possible filters are start date, type of class, status and page number.
-      The filters can be passed as query parameters.
+  3. `PUT /api/v0/classes/:class_id/`
 
-    2. `POST /api/v0/classes/`
+    Update the class.
 
-      Create a new class
+  4. `DELETE /api/v0/classes/:class_id/`
 
-    3. `PUT /api/v0/classes/:class_id/`
+    Deletes a class.
 
-      Update the class.
+  5. `POST /api/v0/classes/reserve-seat/`
 
-    4. `DELETE /api/v0/classes/:class_id/`
+    The required fields here are `class_id` and `user_id`. This reserves seat and
+    sends an otp in the email.
+    Example Payload:
 
-      Deletes a class.
+    ```
+      {
+        class_id: 1,
+        user_id: 1
+      }
+    ```
+  6. `POST /api/v0/classes/confirm-seat/`
 
-    5. `POST /api/v0/classes/reserve-seat/`
-
-      The required fields here are `class_id` and `user_id`. This reserves seat and
-      sends an otp in the email.
-      Example Payload:
-
-      ```
-       {
-         class_id: 1,
-         user_id: 1
-       }
-      ```
-    6. `POST /api/v0/classes/confirm-seat/`
-
-      The required fields here are `class_id` and `user_id`. This confirms the class seat
-      Example Payload:
-       ```
-       {
-         class_id: 1,
-         user_id: 1
-       }
-      ```
-    7. `POST /api/v0/classes/cancel-seat/`
+    The required fields here are `class_id` and `user_id`. This confirms the class seat
+    Example Payload:
 
 
-      The required fields here are `class_id` and `user_id`. This cancels the class seat.
-      Example Payload:
-       ```
-       {
-         class_id: 1,
-         user_id: 1
-       }
-      ```
-    8. `POST /api/v0/report/`
+      {
+        class_id: 1,
+        user_id: 1
+      }
+
+  7. `POST /api/v0/classes/cancel-seat/`
 
 
-      Returns a JSON with Total number of classes, Total number of users enrolled,
-      Number of confirmed seats per class, Number of active classes,  Number of upcoming
-      classes, Number of classes completed
+   The required fields here are `class_id` and `user_id`. This cancels the class seat.
+   Example Payload:
+
+    {
+      class_id: 1,
+      user_id: 1
+    }
+
+  8. `POST /api/v0/report/`
+
+
+    Returns a JSON with Total number of classes, Total number of users enrolled,
+    Number of confirmed seats per class, Number of active classes,  Number of upcoming
+    classes, Number of classes completed
   ### Steps
 
    1. `virtualvenv venv`
