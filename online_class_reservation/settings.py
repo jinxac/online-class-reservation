@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'online_class.apps.OnlineClassConfig',
     'otp',
-    'anymail',
-    'pagination'
+    'anymail'
 ]
 
 MIDDLEWARE = [
@@ -98,6 +97,11 @@ EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"  # or sendgrid.EmailBack
 DEFAULT_FROM_EMAIL = "harkirat@wealthy.in"  # if you don't already have this in settings
 SERVER_EMAIL = "your-server@example.com"  # ditto (default from-email for Django errors)
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

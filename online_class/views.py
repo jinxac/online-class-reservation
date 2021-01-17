@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import json
 from django.http import Http404
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
@@ -24,36 +24,14 @@ from .exceptions import ClassUpdateException, \
             ConfirmSeatDoesNotExistException
 
 from otp.exceptions import OtpMissingException
-class ClassViewSet(viewsets.ModelViewSet):
-  pagination_class = CustomPagination
+class ClassViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+  queryset=Class.objects.all()
+  serializer_class=ClassSerializer
   def get_object(self, pk):
     try:
         return Class.objects.get(pk=pk)
     except Class.DoesNotExist:
         raise Http404
-
-
-  def list(self, request):
-    queryset=Class.objects.all()
-    start_date = self.request.query_params.get('start_date', None)
-    class_type = self.request.query_params.get('class_type', None)
-    status = self.request.query_params.get('status', None)
-
-
-    # Add page number and page size filter to this
-    # add booking status filter
-
-    if start_date:
-      queryset = queryset.filter(class__start_date=start_date)
-
-    if class_type:
-      queryset = queryset.filter(class__class_type=class_type)
-
-    if status:
-      queryset = queryset.filter(class__status= status)
-
-    serializer=ClassSerializer(queryset, many=True)
-    return Response(serializer.data)
 
   def retrieve(self, request, pk=None):
     queryset = Class.objects.get(id=pk)
