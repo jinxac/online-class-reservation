@@ -87,11 +87,7 @@ DATABASES = {
     }
 }
 
-ANYMAIL = {
-    # (exact settings here depend on your ESP...)
-    "MAILGUN_API_KEY": "10f482b2f4bd1d763c2faa9a7296dbfc-28d78af2-032c7d43",
-    "MAILGUN_SENDER_DOMAIN": 'sandbox48d7011aa1114733a3af961c91fc1c0a.mailgun.org'
-}
+
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"  # or sendgrid.EmailBackend, or...
 DEFAULT_FROM_EMAIL = "harkirat@wealthy.in"  # if you don't already have this in settings
