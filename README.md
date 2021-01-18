@@ -14,25 +14,25 @@ confirm his/ her reservation within 5 mins.
 
 
 ### Features
-  1. `GET /api/v0/classes/`
+  1. `GET /api/classes/`
 
 
     Returns list of classes available. The possible filters are start date, type of class, status and page number.
     The filters can be passed as query parameters.
 
-  2. `POST /api/v0/classes/`
+  2. `POST /api/classes/`
 
     Create a new class
 
-  3. `PUT /api/v0/classes/:class_id/`
+  3. `PUT /api/classes/:class_id/`
 
     Update the class.
 
-  4. `DELETE /api/v0/classes/:class_id/`
+  4. `DELETE /api/classes/:class_id/`
 
     Deletes a class.
 
-  5. `POST /api/v0/classes/reserve-seat/`
+  5. `POST /api/classes/reserve-seat/`
 
     The required fields here are `class_id` and `user_id`. This reserves seat and
     sends an otp in the email.
@@ -44,7 +44,7 @@ confirm his/ her reservation within 5 mins.
         user_id: 1
       }
     ```
-  6. `POST /api/v0/classes/confirm-seat/`
+  6. `POST /api/classes/confirm-seat/`
 
     The required fields here are `class_id` and `user_id`. This confirms the class seat
     Example Payload:
@@ -55,7 +55,7 @@ confirm his/ her reservation within 5 mins.
         user_id: 1
       }
 
-  7. `POST /api/v0/classes/cancel-seat/`
+  7. `POST /api/classes/cancel-seat/`
 
 
    The required fields here are `class_id` and `user_id`. This cancels the class seat.
@@ -66,7 +66,7 @@ confirm his/ her reservation within 5 mins.
       user_id: 1
     }
 
-  8. `POST /api/v0/report/`
+  8. `POST /api/report/`
 
 
     Returns a JSON with Total number of classes, Total number of users enrolled,
